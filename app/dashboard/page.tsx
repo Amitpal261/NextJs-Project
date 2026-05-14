@@ -1,6 +1,6 @@
 // app/dashboard/page.tsx
 
-import { cookies } from 'next/headers'
+import { cookies, headers } from 'next/headers'
 import Image from 'next/image'
 import { redirect } from 'next/navigation'
 
@@ -9,6 +9,18 @@ export const dynamic = 'force-dynamic'
 export default async function Dashboard(): Promise<React.ReactElement> {
   const cookieStore = await cookies()
   const user = cookieStore.get('user')?.value
+
+  const headerList = await headers()
+
+  // 🔥 Extract multiple headers
+  const userAgent = headerList.get('user-agent') || 'Unknown'
+  const language = headerList.get('accept-language') || 'Unknown'
+  const host = headerList.get('host') || 'Unknown'
+  const referer = headerList.get('referer') || 'Direct Visit'
+  const authHeader = headerList.get('authorization') || 'No Auth Header'
+
+  // ⚡ Detect device type (basic logic)
+  const device = userAgent.includes('Mobile') ? 'Mobile 📱' : 'Desktop 💻'
 
   if (!user) {
     redirect('/login')
@@ -36,7 +48,7 @@ export default async function Dashboard(): Promise<React.ReactElement> {
         <div className="flex items-center justify-between mb-10">
           <div>
             <h1 className="text-3xl font-semibold tracking-tight">
-              Dashboard
+              Dashboard      
             </h1>
             <p className="text-gray-400 text-sm">
               Welcome back, {user}
@@ -51,14 +63,18 @@ export default async function Dashboard(): Promise<React.ReactElement> {
           </a>
         </div>
 
-        {/* 🧊 Main Glass Card */}
-        <div className="p-8 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 shadow-2xl mb-8">
-          <h2 className="text-xl font-medium mb-2">
-            Overview
-          </h2>
-          <p className="text-gray-300">
-            Youre successfully logged in. This is your private dashboard space.
-          </p>
+        {/* 🧊 Header Info Card */}
+        <div className="p-6 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 shadow mb-8">
+          <h2 className="text-lg font-medium mb-4">Request Info</h2>
+
+          <div className="grid sm:grid-cols-2 gap-4 text-sm text-gray-300">
+            <p><strong>User Agent:</strong> {userAgent}</p>
+            <p><strong>Device:</strong> {device}</p>
+            <p><strong>Language:</strong> {language}</p>
+            <p><strong>Host:</strong> {host}</p>
+            <p><strong>Referer:</strong> {referer}</p>
+            <p><strong>Authorization:</strong> {authHeader}</p>
+          </div>
         </div>
 
         {/* 📊 Stats Grid */}
