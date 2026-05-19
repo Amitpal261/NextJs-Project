@@ -6,7 +6,7 @@ import { User, LogOut, Settings } from "lucide-react";
 
 export default function ProfileMenu() {
   const [open, setOpen] = useState(false);
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<{ username: string; email: string } | null>(null);
 
   // ✅ Fetch logged-in user
   useEffect(() => {

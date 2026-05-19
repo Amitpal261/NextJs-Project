@@ -3,7 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthModal } from "../context/AuthModalContext";
-
+import { signUpSchema } from "@/schema/signUpSchma";
+import { ZodSafeParseResult } from "zod";
 
 export default function SignupModal() {
   const [username, setUsername] = useState("");
@@ -11,13 +12,27 @@ export default function SignupModal() {
   const [password, setPassword] = useState("");
   const router = useRouter();
   const { mode, setMode } = useAuthModal();
+  const [displayedValidatedData, setdisplayedValidatedData] = useState<
+    ZodSafeParseResult<{
+      username: string;
+      email: string;
+      password: string;
+    }>
+  >({
+    success: true,
+    data: { username: "", email: "", password: "" },
+  });
 
-  if (mode !== "signup") return null
- 
 
-  
+  if (mode !== "signup") return null;
 
   const handleSignup = async () => {
+    const validatedData = signUpSchema.safeParse({ username, email, password });
+    setdisplayedValidatedData(validatedData);
+
+    if (!validatedData.success) {
+      return; // stop here if invalid
+    }
     const res = await fetch("/api/signup", {
       method: "POST",
       body: JSON.stringify({ username, email, password }),
@@ -28,21 +43,19 @@ export default function SignupModal() {
     });
 
     const data = await res.json();
-    console.log("SIGNUP RESPONSE:", data);
 
-    if (data.success) {
+    if (validatedData.success) {
       alert(data.message);
       setMode(null);
       router.refresh();
     } else {
       alert(data.message || "Signup failed");
-      if(data.message === "User already exists!") {
+      if (data.message === "User already exists!") {
         setMode("login");
       }
     }
   };
 
-  if (!open) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
@@ -64,14 +77,26 @@ export default function SignupModal() {
             onChange={(e) => setUsername(e.target.value)}
             className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-400"
           />
-
+          <p className="text-red-500 text-sm ">
+            {displayedValidatedData.success
+              ? null
+              : displayedValidatedData.error?.issues?.find(
+                  (err) => err.path[0] === "username",
+                )?.message}
+          </p>
           <input
             placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-400"
           />
-
+          <p className="text-red-500 text-sm ">
+            {displayedValidatedData.success
+              ? null
+              : displayedValidatedData.error?.issues?.find(
+                  (err) => err.path[0] === "email",
+                )?.message}
+          </p>
           <input
             type="password"
             placeholder="Password"
@@ -80,10 +105,14 @@ export default function SignupModal() {
             className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-400"
           />
         </div>
-        <button
-          
-          className="mt-5 w-full py-3 transition"
-        >
+        <p className="text-red-500 text-sm ">
+          {displayedValidatedData.success
+            ? null
+            : displayedValidatedData.error?.issues?.find(
+                (err) => err.path[0] === "password",
+              )?.message}
+        </p>
+        <p className="mt-4 w-full py-3 transition">
           already have an account?{" "}
           <button
             className="text-blue-300 hover:text-blue-400"
@@ -91,7 +120,7 @@ export default function SignupModal() {
           >
             login
           </button>
-        </button>
+        </p>
 
         <button
           onClick={() => {
