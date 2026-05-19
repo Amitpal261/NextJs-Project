@@ -23,7 +23,7 @@ export default async function Dashboard(): Promise<React.ReactElement> {
   const device = userAgent.includes('Mobile') ? 'Mobile 📱' : 'Desktop 💻'
 
   if (!user) {
-    redirect('/login')
+    redirect('/service')
   }
 
   return (
@@ -56,7 +56,7 @@ export default async function Dashboard(): Promise<React.ReactElement> {
           </div>
 
           <a
-            href="/api/logout"
+            href="/contact"
             className="px-4 py-2 rounded-xl bg-white/10 border border-white/20 backdrop-blur-lg hover:bg-white/20 transition"
           >
             Logout

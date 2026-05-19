@@ -2,6 +2,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "./components/Navbar";
 import { AuthModalProvider } from "./context/AuthModalContext";
+// import LoginModal from "./components/LoginModal";
+import SignupModal from "./components/SignupModel";
 import LoginModal from "./components/LoginModal";
 
 const geistSans = Geist({
@@ -40,6 +42,7 @@ export default function RootLayout({
         <AuthModalProvider>
         <Navbar />
           <LoginModal/>
+          <SignupModal/>
         {children}
         </AuthModalProvider>
       </body>

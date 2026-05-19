@@ -2,7 +2,7 @@ import React, { Suspense } from 'react'
 import Review from './components/Review';
 import { Geist_Mono } from "next/font/google";
 import ClientComp from './components/ClientComp';
-import { getUsers } from './lib/data';
+import { getUsers } from '../lib/data';
 import { User } from './types/user';
 import UseRouter from './components/UseRouter';
  
